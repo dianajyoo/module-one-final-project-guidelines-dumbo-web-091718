@@ -1,7 +1,7 @@
 def welcome
   puts "
         Welcome to myBrews
-        Please enter a number (1-7):
+        Please enter a number (1-8):
         1. Create Profile
         2. Add New Coffee
         3. See All Coffee
@@ -13,9 +13,13 @@ def welcome
 end
 
 def create_profile
-  loop do
-    puts "What is your full name?"
-    name = gets.chomp.downcase
+  puts "What is your full name?"
+  name = gets.chomp.downcase
+  if name == "menu"
+    menu
+  end
+
+  while name != "menu"
     if name.match(/^[[:alpha:][:blank:]]+$/) == nil
       puts "Not a valid name. Please try again."
     elsif name.split.count < 2
@@ -26,11 +30,15 @@ def create_profile
       break
     end
   end
+  welcome
 end
 
 def add_new_coffee
   puts "Who drank this coffee? (Please enter name)"
   user = gets.chomp.downcase
+  if user == "menu"
+    menu
+  end
 
   if User.find_by(name: user) == nil
     puts "Please create a profile"
@@ -39,45 +47,57 @@ def add_new_coffee
     user_id = User.find_by(name: user).id
   end
 
-  request = ["Please enter a coffee name", "Where did you get it?", "How much did it cost?", "How did it taste?"]
-  inputs = request.map do |request|
-    puts request
-    input = gets.chomp
-    until input.empty? == false
-      puts "Please enter a valid input"
+  if user != "menu"
+    request = ["Please enter a coffee name", "Where did you get it?", "How much did it cost?", "How did it taste?"]
+    inputs = request.map do |request|
+      puts request
       input = gets.chomp
+      until input.empty? == false
+        puts "Please enter a valid input"
+        input = gets.chomp
+      end
     end
+    Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), cost: inputs[2], taste: inputs[3])
+    MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
+    puts "Thanks for letting me know!"
   end
-
-  Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), cost: inputs[2], taste: inputs[3])
-  MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
-
-  puts "Thanks for letting me know!"
 end
 
 def see_all_coffees
   puts "What is your name?"
   user_input = gets.chomp.downcase
+  if user_input == "menu"
+    menu
+  end
 
-  user = User.find_by(name: user_input)
-
-  puts "Here are your coffees:"
-  user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
+  if user_input != "menu"
+    user = User.find_by(name: user_input)
+    puts "Here are your coffees:"
+    user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
+  end
 end
 
 def add_to_favorites
   puts "What is your name?"
   user_input = gets.chomp.downcase
+  if user_input == "menu"
+    menu
+  end
 
-  puts "Please enter the coffee's name"
-  coffee_input = gets.chomp
+  if user_input != "menu"
+    puts "Please enter the coffee's name"
+    coffee_input = gets.chomp
+    if coffee_input == "menu"
+      menu
+    end
 
-  user = User.find_by(name: user_input)
+    user = User.find_by(name: user_input)
 
-  user.coffees.each do |coffee|
-    if coffee.name == coffee_input
-      coffee.favorites = true
-      coffee.save
+    user.coffees.each do |coffee|
+      if coffee.name == coffee_input
+        coffee.favorites = true
+        coffee.save
+      end
     end
   end
 end
@@ -85,66 +105,82 @@ end
 def bring_up_favorites
   puts "What is your name?"
   user_input = gets.chomp.downcase
+  if user_input == "menu"
+    menu
+  end
 
-  user = User.find_by(name: user_input)
+  if user_input != "menu"
+    user = User.find_by(name: user_input)
 
-  puts "You love this coffee:"
+    puts "You love this coffee:"
 
-  user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
+    user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
+  end
 end
 
 def suggestion
   puts "How much do you want to pay?"
-  cost = gets.chomp.to_f
+  cost = gets.chomp
+  if cost == "menu"
+    menu
+  end
 
-  puts "Maybe try this:"
-  suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost).round(2), taste: Faker::Coffee.notes, rating: 3)
+  if cost != "menu"
+    puts "Maybe try this:"
+    suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost).to_f.round(2), taste: Faker::Coffee.notes, rating: 3)
 
-  puts "
-        Name: #{suggestion.name}
-        Shop Name: #{suggestion.shop_name}
-        Price: $#{suggestion.cost}
-        Taste: #{suggestion.taste}
-        "
+    puts "
+          Name: #{suggestion.name}
+          Shop Name: #{suggestion.shop_name}
+          Price: $#{suggestion.cost}
+          Taste: #{suggestion.taste}
+          "
 
-  puts "Do you want to save this? (Y/N)"
-  option = gets.chomp.downcase
+    puts "Do you want to save this? (Y/N)"
+    option = gets.chomp.downcase
 
-  if option == "y"
-    suggestion.save
+    if option == "y"
+      suggestion.save
 
-    puts "Who is saving this coffee? (Please enter name)"
-    user = gets.chomp.downcase
-    user_id = User.find_by(name: user).id
+      puts "Who is saving this coffee? (Please enter name)"
+      user = gets.chomp.downcase
+      user_id = User.find_by(name: user).id
 
-    MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
-    puts "Saved"
-  else
-    puts "It vanished!"
+      MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
+      puts "Saved"
+    else
+      puts "It vanished!"
+    end
   end
 end
 
 def search_coffees
   puts "What coffee would you like to search"
   coffee = gets.chomp
-  found_coffee = Coffee.where(name: capitalize(coffee)).distinct
+  if coffee == "menu"
+    menu
+  end
 
-  if found_coffee == nil
-    puts "Sorry, no coffee by that name!"
-    search_coffees
-  elsif found_coffee.count == 1
-    puts "
-          Name: #{found_coffee.name}
-          Shop Name: #{found_coffee.shop_name}
-          Price: $#{found_coffee.cost}
-          "
-  elsif found_coffee.count > 1
-    found_coffee.each do |coffee|
+  if coffee != "menu"
+    found_coffee = Coffee.where(name: capitalize(coffee)).distinct
+
+    if found_coffee == nil
+      puts "Sorry, no coffee by that name!"
+      search_coffees
+    elsif found_coffee.count == 1
       puts "
-            Name: #{coffee.name}
-            Shop Name: #{coffee.shop_name}
-            Price: $#{coffee.cost}
+            Name: #{found_coffee.name}
+            Shop Name: #{found_coffee.shop_name}
+            Price: $#{found_coffee.cost}
             "
+    elsif found_coffee.count > 1
+      found_coffee.each do |coffee|
+        puts "
+              Name: #{coffee.name}
+              Shop Name: #{coffee.shop_name}
+              Price: $#{coffee.cost}
+              "
+      end
     end
   end
 end
@@ -157,9 +193,17 @@ def capitalize(name)
   end
 end
 
-def run
-  loop do
+def menu
+  puts "Would you like to go back to the menu? (Y/N)"
+  input = gets.chomp.downcase
+  if input == "y"
     welcome
+  end
+end
+
+def run
+  welcome
+  loop do
     option = gets.chomp
     case option
     when "1"
