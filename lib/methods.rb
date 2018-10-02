@@ -16,7 +16,7 @@ def create_profile
   loop do
     puts "What is your full name?"
     name = gets.chomp.downcase
-    if name.to_i.class == Fixnum && name.to_i > 0
+    if name.match(/^[[:alpha:][:blank:]]+$/) == nil
       puts "Not a valid name. Please try again."
     elsif name.split.count < 2
       puts "Please enter your full name."
@@ -39,23 +39,19 @@ def add_new_coffee
     user_id = User.find_by(name: user).id
   end
 
-  puts "Please enter a coffee name"
-  name = gets.chomp
+  request = ["Please enter a coffee name", "Where did you get it?", "How much did it cost?", "How did it taste?"]
+  inputs = request.map do |request|
+    puts request
+    input = gets.chomp
+    until input.empty? == false
+      puts "Please enter a valid input"
+      input = gets.chomp
+    end
+  end
 
-  puts "Where did you get it?"
-  shop_name = gets.chomp
-
-  puts "How much did it cost?"
-  cost = gets.chomp.to_f
-
-  puts "Please rate from 1-5"
-  rating = gets.chomp
-
-  puts "How did it taste?"
-  taste = gets.chomp
-
-  Coffee.create(name: capitalize(name), shop_name: capitalize(shop_name), cost: cost, rating: rating, taste: taste)
+  Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), cost: inputs[2], taste: inputs[3])
   MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
+
   puts "Thanks for letting me know!"
 end
 
@@ -131,7 +127,7 @@ end
 def search_coffees
   puts "What coffee would you like to search"
   coffee = gets.chomp
-  found_coffee = Coffee.where(name: capitalize(coffee)).uniq
+  found_coffee = Coffee.where(name: capitalize(coffee)).distinct
 
   if found_coffee == nil
     puts "Sorry, no coffee by that name!"
