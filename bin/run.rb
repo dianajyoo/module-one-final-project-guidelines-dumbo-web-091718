@@ -3,7 +3,7 @@ require 'pry'
 
 def welcome
   puts "
-        Welcome to Coffee App
+        Welcome to myBrews
         Please enter a number (1-7):
         1. Create Profile
         2. Add New Coffee
@@ -16,21 +16,21 @@ end
 
 def create_profile
   puts "What is your full name?"
-  name = gets.chomp
+  name = gets.chomp.downcase
   User.create(name: name)
-  puts "Hi, #{name}"
+  puts "Hi, #{name.split.map(&:capitalize).join(' ')}"
 end
 
 def add_new_coffee
   puts "Who drank this coffee? (Please enter name)"
-  user = gets.chomp
+  user = gets.chomp.downcase
   user_id = User.find_by(name: user).id
 
-  puts "Please enter a name"
+  puts "Please enter a coffee name"
   name = gets.chomp
 
   puts "Where did you get it?"
-  location = gets.chomp
+  shop_name = gets.chomp
 
   puts "How much did it cost?"
   cost = gets.chomp.to_f
@@ -41,14 +41,26 @@ def add_new_coffee
   puts "How did it taste?"
   taste = gets.chomp
 
-  Coffee.create(name: name, location: location, cost: cost, rating: rating, taste: taste)
-  My_Coffee.create(user_id: user_id, coffee_id: Coffee.last.id)
+  if name.split(' ').size > 1
+    proper_name = name.split.map {|x| x.capitalize!}.join(' ')
+  else
+    proper_name = name.capitalize!
+  end
+
+  if shop_name.split(' ').size > 1
+    proper_shop = shop_name.split.map {|x| x.capitalize!}.join(' ')
+  else
+    proper_shop = shop_name.capitalize!
+  end
+
+  Coffee.create(name: proper_name, shop_name: proper_shop, cost: cost, rating: rating, taste: taste)
+  MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
   puts "Thanks for letting me know!"
 end
 
 def see_all_coffees
   puts "What is your name?"
-  user_input = gets.chomp
+  user_input = gets.chomp.downcase
 
   user = User.find_by(name: user_input)
 
@@ -58,7 +70,7 @@ end
 
 def add_to_favorites
   puts "What is your name?"
-  user_input = gets.chomp
+  user_input = gets.chomp.downcase
 
   puts "Please enter the coffee's name"
   coffee_input = gets.chomp
@@ -75,13 +87,44 @@ end
 
 def bring_up_favorites
   puts "What is your name?"
-  user_input = gets.chomp
+  user_input = gets.chomp.downcase
 
   user = User.find_by(name: user_input)
 
   puts "You love this coffee:"
 
   user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
+end
+
+def suggestion
+  puts "How much do you want to pay?"
+  cost = gets.chomp.to_f
+
+  puts "Maybe try this:"
+  suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost).round(2), taste: Faker::Coffee.notes, rating: 3)
+
+  puts "
+        Name: #{suggestion.name}
+        Shop Name: #{suggestion.shop_name}
+        Price: $#{suggestion.cost}
+        Taste: #{suggestion.taste}
+        "
+
+  puts "Do you want to save this? (Y/N)"
+  option = gets.chomp.downcase
+
+  if option == "y"
+    suggestion.save
+
+    puts "Who is saving this coffee? (Please enter name)"
+    user = gets.chomp.downcase
+    user_id = User.find_by(name: user).id
+
+    MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
+    puts "Saved"
+  else
+    puts "It vanished!"
+  end
 end
 
 def run
@@ -99,11 +142,13 @@ def run
       add_to_favorites
     when "5"
       bring_up_favorites
-    # when "6"
-    #   get_a_suggestion
+    when "6"
+      suggestion
     when "7"
       puts "Goodbye!"
       break
+    else
+      puts "Please enter a valid command."
     end
   end
 end
