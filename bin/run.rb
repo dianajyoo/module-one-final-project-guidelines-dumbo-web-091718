@@ -15,16 +15,31 @@ def welcome
 end
 
 def create_profile
-  puts "What is your full name?"
-  name = gets.chomp.downcase
-  User.create(name: name)
-  puts "Hi, #{name.split.map(&:capitalize).join(' ')}"
+  loop do
+    puts "What is your full name?"
+    name = gets.chomp.downcase
+    if name.to_i.class == Fixnum && name.to_i > 0
+      puts "Not a valid name. Please try again."
+    elsif name.split.count < 2
+      puts "Please enter your full name."
+    else
+      User.create(name: name)
+      puts "Hi, #{name.split.map(&:capitalize).join(' ')}"
+      break
+    end
+  end
 end
 
 def add_new_coffee
   puts "Who drank this coffee? (Please enter name)"
   user = gets.chomp.downcase
-  user_id = User.find_by(name: user).id
+
+  if User.find_by(name: user) == nil
+    puts "Please create a profile"
+    create_profile
+  else
+    user_id = User.find_by(name: user).id
+  end
 
   puts "Please enter a coffee name"
   name = gets.chomp
@@ -41,19 +56,7 @@ def add_new_coffee
   puts "How did it taste?"
   taste = gets.chomp
 
-  if name.split(' ').size > 1
-    proper_name = name.split.map {|x| x.capitalize!}.join(' ')
-  else
-    proper_name = name.capitalize!
-  end
-
-  if shop_name.split(' ').size > 1
-    proper_shop = shop_name.split.map {|x| x.capitalize!}.join(' ')
-  else
-    proper_shop = shop_name.capitalize!
-  end
-
-  Coffee.create(name: proper_name, shop_name: proper_shop, cost: cost, rating: rating, taste: taste)
+  Coffee.create(name: capitalize(name), shop_name: capitalize(shop_name), cost: cost, rating: rating, taste: taste)
   MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
   puts "Thanks for letting me know!"
 end
@@ -124,6 +127,14 @@ def suggestion
     puts "Saved"
   else
     puts "It vanished!"
+  end
+end
+
+def capitalize(name)
+  if name.split(' ').size > 1
+    name.split.map {|x| x.capitalize!}.join(' ')
+  else
+    name.capitalize!
   end
 end
 
