@@ -2,15 +2,16 @@ require_relative '../config/environment'
 require 'pry'
 
 def welcome
-  puts "Welcome to Coffee App"
-  puts "Please select an option:"
-  puts "1. Create Profile"
-  puts "2. Add New Coffee"
-  puts "3. See All Coffee"
-  puts "4. Add to Favorites"
-  puts "5. Bring Up Favorites"
-  puts "6. Get a Suggestion"
-  option = gets.chomp
+  puts "
+        Welcome to Coffee App
+        Please enter a number (1-7):
+        1. Create Profile
+        2. Add New Coffee
+        3. See All Coffee
+        4. Add to Favorites
+        5. Bring Up Favorites
+        6. Get a Suggestion
+        7. Exit"
 end
 
 def create_profile
@@ -50,12 +51,9 @@ def see_all_coffees
   user_input = gets.chomp
 
   user = User.find_by(name: user_input)
-  binding.pry
 
   puts "Here are your coffees:"
-  user.coffee_names.each do |coffee_name|
-    puts "#{coffee_name}"
-  end
+  user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
 end
 
 def add_to_favorites
@@ -70,6 +68,7 @@ def add_to_favorites
   user.coffees.each do |coffee|
     if coffee.name == coffee_input
       coffee.favorites = true
+      coffee.save
     end
   end
 end
@@ -82,14 +81,31 @@ def bring_up_favorites
 
   puts "You love this coffee:"
 
-  user.coffees.select  {|coffee_name| coffee.favorites == true}.map {|fave_coffee| fave_coffee.name}
+  user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
 end
 
-welcome
-# create_profile
-# add_new_coffee
-# see_all_coffees
-# add_to_favorites
-bring_up_favorites
-binding.pry
-0
+def run
+  loop do
+    welcome
+    option = gets.chomp
+    case option
+    when "1"
+      create_profile
+    when "2"
+      add_new_coffee
+    when "3"
+      see_all_coffees
+    when "4"
+      add_to_favorites
+    when "5"
+      bring_up_favorites
+    # when "6"
+    #   get_a_suggestion
+    when "7"
+      puts "Goodbye!"
+      break
+    end
+  end
+end
+
+run
