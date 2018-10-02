@@ -11,7 +11,8 @@ def welcome
         4. Add to Favorites
         5. Bring Up Favorites
         6. Get a Suggestion
-        7. Exit"
+        7. Search Coffees
+        8. Exit"
 end
 
 def create_profile
@@ -130,6 +131,31 @@ def suggestion
   end
 end
 
+def search_coffees
+  puts "What coffee would you like to search"
+  coffee = gets.chomp
+  found_coffee = Coffee.where(name: capitalize(coffee)).uniq
+
+  if found_coffee == nil
+    puts "Sorry, no coffee by that name!"
+    search_coffees
+  elsif found_coffee.count == 1
+    puts "
+          Name: #{found_coffee.name}
+          Shop Name: #{found_coffee.shop_name}
+          Price: $#{found_coffee.cost}
+          "
+  elsif found_coffee.count > 1
+    found_coffee.each do |coffee|
+      puts "
+            Name: #{coffee.name}
+            Shop Name: #{coffee.shop_name}
+            Price: $#{coffee.cost}
+            "
+    end
+  end
+end
+
 def capitalize(name)
   if name.split(' ').size > 1
     name.split.map {|x| x.capitalize!}.join(' ')
@@ -156,6 +182,8 @@ def run
     when "6"
       suggestion
     when "7"
+      search_coffees
+    when "8"
       puts "Goodbye!"
       break
     else
