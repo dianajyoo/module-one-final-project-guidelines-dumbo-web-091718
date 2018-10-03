@@ -12,25 +12,43 @@ def welcome
         8. Exit"
 end
 
-def create_profile
-  puts "What is your full name?"
-  name = gets.chomp.downcase
-  if name == "menu"
-    menu
+def get_login
+
+  puts "Welcome to myBrews!"
+  puts "==================="
+
+  puts "Please enter full name to login"
+  $name = gets.chomp.downcase
+
+  puts "Please enter a password"
+  password = gets.chomp.downcase
+
+  until $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
+    puts "Not a valid name. Please enter full name."
+    get_login
   end
 
-  while name != "menu"
-    if name.match(/^[[:alpha:][:blank:]]+$/) == nil
-      puts "Not a valid name. Please try again."
-    elsif name.split.count < 2
-      puts "Please enter your full name."
-    else
-      User.create(name: name)
-      puts "Hi, #{name.split.map(&:capitalize).join(' ')}"
-      break
-    end
+  User.find_or_create_by(name: $name, password: password)
+
+end
+
+def get_welcome
+
+  if $name != "menu"
+    welcome
   end
-  welcome
+
+end
+
+
+def return_to_menu
+
+  if $name == "menu"
+    menu
+  else
+    welcome
+  end
+
 end
 
 def add_new_coffee
@@ -119,15 +137,15 @@ def bring_up_favorites
 end
 
 def suggestion
-  puts "How much do you want to pay?"
-  cost = gets.chomp
+  puts "How much do you want to pay? (Enter Number)"
+  cost = gets.chomp.to_f
   if cost == "menu"
     menu
   end
 
   if cost != "menu"
     puts "Maybe try this:"
-    suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost).to_f.round(2), taste: Faker::Coffee.notes, rating: 3)
+    suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost).round(2), taste: Faker::Coffee.notes)
 
     puts "
           Name: #{suggestion.name}
