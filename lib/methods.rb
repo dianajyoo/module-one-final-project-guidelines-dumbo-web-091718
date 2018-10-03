@@ -1,15 +1,14 @@
 def welcome
   puts "
-        Welcome to myBrews
-        Please enter a number (1-8):
-        1. Create Profile
-        2. Add New Coffee
-        3. See All Coffee
-        4. Add to Favorites
-        5. Bring Up Favorites
-        6. Get a Suggestion
-        7. Search Coffees
-        8. Exit"
+        Welcome to myBrews, #{$name}
+        Please enter a number (1-7):
+        1. Add New Coffee
+        2. See All Coffee
+        3. Add to Favorites
+        4. Bring Up Favorites
+        5. Get a Suggestion
+        6. Search Coffees
+        7. Exit"
 end
 
 def get_login
@@ -21,22 +20,15 @@ def get_login
   $name = gets.chomp.downcase
 
   puts "Please enter a password"
-  password = gets.chomp.downcase
+  $password = gets.chomp.downcase
 
-  until $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
+
+  while $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
     puts "Not a valid name. Please enter full name."
     get_login
   end
 
-  User.find_or_create_by(name: $name, password: password)
-
-end
-
-def get_welcome
-
-  if $name != "menu"
-    welcome
-  end
+  User.find_or_create_by(name: $name, password: $password)
 
 end
 
@@ -51,89 +43,63 @@ def return_to_menu
 
 end
 
+def get_user
+  User.find_by(name: $name, password: $password)
+end
+
 def add_new_coffee
-  puts "Who drank this coffee? (Please enter name)"
-  user = gets.chomp.downcase
-  if user == "menu"
-    menu
-  end
+  user_id = User.find_by(name: $name, password: $password).id
+  inputs = []
 
-  if User.find_by(name: user) == nil
-    puts "Please create a profile"
-    create_profile
-  else
-    user_id = User.find_by(name: user).id
-  end
-
-  if user != "menu"
-    request = ["Please enter a coffee name", "Where did you get it?", "How much did it cost?", "How did it taste?"]
-    inputs = request.map do |request|
-      puts request
+  request = ["Please enter a coffee name", "Where did you get it?", "How much did it cost?", "How did it taste?"]
+  request.map do |request|
+    puts request
+    input = gets.chomp
+    until input.empty? == false
+      puts "Please enter a valid input"
       input = gets.chomp
-      until input.empty? == false
-        puts "Please enter a valid input"
-        input = gets.chomp
-      end
     end
-    Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), cost: inputs[2], taste: inputs[3])
-    MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
-    puts "Thanks for letting me know!"
+    inputs << input
   end
+
+  Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), cost: inputs[2], taste: inputs[3])
+  MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
+  puts "Thanks for letting me know!"
+  welcome
 end
 
 def see_all_coffees
-  puts "What is your name?"
-  user_input = gets.chomp.downcase
-  if user_input == "menu"
-    menu
-  end
 
-  if user_input != "menu"
-    user = User.find_by(name: user_input)
+  if get_user.coffee_names.empty?
+    puts "No coffees!"
+  else
     puts "Here are your coffees:"
-    user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
+    get_user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
   end
+  welcome
 end
 
 def add_to_favorites
-  puts "What is your name?"
-  user_input = gets.chomp.downcase
-  if user_input == "menu"
+  puts "Please enter the coffee's name"
+  coffee_input = gets.chomp.downcase
+  if coffee_input == "menu"
     menu
   end
 
-  if user_input != "menu"
-    puts "Please enter the coffee's name"
-    coffee_input = gets.chomp
-    if coffee_input == "menu"
-      menu
-    end
-
-    user = User.find_by(name: user_input)
-
-    user.coffees.each do |coffee|
-      if coffee.name == coffee_input
-        coffee.favorites = true
-        coffee.save
-      end
+  get_user.coffees.each do |coffee|
+    if coffee.name.downcase == coffee_input
+      coffee.favorites = true
+      coffee.save
+      puts "Added to favorites!"
     end
   end
+  welcome
 end
 
 def bring_up_favorites
-  puts "What is your name?"
-  user_input = gets.chomp.downcase
-  if user_input == "menu"
-    menu
-  end
-
-  if user_input != "menu"
-    user = User.find_by(name: user_input)
-
-    puts "You love this coffee:"
-
-    user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
-  end
+  puts "You love this coffee:"
+  get_user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
+  welcome
 end
 
 def suggestion
@@ -220,25 +186,24 @@ def menu
 end
 
 def run
+  get_login
   welcome
   loop do
     option = gets.chomp
     case option
     when "1"
-      create_profile
-    when "2"
       add_new_coffee
-    when "3"
+    when "2"
       see_all_coffees
-    when "4"
+    when "3"
       add_to_favorites
-    when "5"
+    when "4"
       bring_up_favorites
-    when "6"
+    when "5"
       suggestion
-    when "7"
+    when "6"
       search_coffees
-    when "8"
+    when "7"
       puts "Goodbye!"
       break
     else
