@@ -20,16 +20,25 @@ def get_login
   $name = gets.chomp.downcase
 
   puts "Please enter a password"
-  $password = gets.chomp.downcase
+  $password = gets.chomp
 
 
   while $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
     puts "Not a valid name. Please enter full name."
     get_login
   end
+  users = User.where(name: $name)
 
-  User.find_or_create_by(name: $name, password: $password)
-
+  if users.empty?
+    User.create(name: $name, password: $password)
+  else
+    password = User.find_by(name: $name).password
+    until password == $password
+      puts "Incorrect Password! Please try again!", ""
+      $password = gets.chomp
+    end
+    User.find_by(password: $password)
+  end
 end
 
 def get_user
