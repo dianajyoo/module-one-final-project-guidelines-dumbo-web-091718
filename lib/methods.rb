@@ -1,6 +1,6 @@
 def welcome
   puts "
-        Welcome to myBrews, #{$name}
+        Welcome to myBrews, #{capitalize($name)}
         Please enter a number (1-7):
         1. Add New Coffee
         2. See All Coffee
@@ -51,7 +51,7 @@ def add_new_coffee
   user_id = User.find_by(name: $name, password: $password).id
   inputs = []
 
-  request = ["Please enter a coffee name", "Where did you get it?", "How much did it cost?", "How did it taste?"]
+  request = ["Please enter a coffee name", "Where did you get it?", "How did it taste?", "How much did it cost? (Enter Number)"]
   request.map do |request|
     puts request
     input = gets.chomp
@@ -60,9 +60,14 @@ def add_new_coffee
       input = gets.chomp
     end
     inputs << input
+
+    while inputs.count > 3 && inputs[3].to_f == 0
+      puts "Please enter a valid number for cost"
+      inputs[3] = gets.chomp
+    end
   end
 
-  Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), cost: inputs[2], taste: inputs[3])
+  Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), taste: inputs[2], cost: inputs[3])
   MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
   puts "Thanks for letting me know!"
   welcome
@@ -104,14 +109,17 @@ end
 
 def suggestion
   puts "How much do you want to pay? (Enter Number)"
-  cost = gets.chomp.to_f
+  cost = gets.chomp
   if cost == "menu"
     menu
-  end
+  else
+    until cost.to_f > 0.0
+      puts "Please enter a valid number for cost"
+      suggestion
+    end
 
-  if cost != "menu"
     puts "Maybe try this:"
-    suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost).round(2), taste: Faker::Coffee.notes)
+    suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost.to_f).round(2), taste: Faker::Coffee.notes)
 
     puts "
           Name: #{suggestion.name}
@@ -136,37 +144,44 @@ def suggestion
       puts "It vanished!"
     end
   end
+  welcome
 end
 
 def search_coffees
-  puts "What coffee would you like to search"
-  coffee = gets.chomp
-  if coffee == "menu"
-    menu
+
+  inputs = []
+
+  requests = ["What coffee would you like to search", "Which coffee shop?"]
+  requests.map do |request|
+    puts request
+    input = gets.chomp
+    until input.empty? == false
+      puts "Please enter a valid input"
+      input = gets.chomp
+    end
+    inputs << input
   end
 
-  if coffee != "menu"
-    found_coffee = Coffee.where(name: capitalize(coffee)).distinct
+
+  # coffee = gets.chomp
+  # if coffee == "menu"
+  #   menu
+  # end
+  #
+  # if coffee != "menu"
+    found_coffee = Coffee.find_by(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]))
 
     if found_coffee == nil
       puts "Sorry, no coffee by that name!"
-      search_coffees
-    elsif found_coffee.count == 1
+    else
       puts "
             Name: #{found_coffee.name}
             Shop Name: #{found_coffee.shop_name}
             Price: $#{found_coffee.cost}
             "
-    elsif found_coffee.count > 1
-      found_coffee.each do |coffee|
-        puts "
-              Name: #{coffee.name}
-              Shop Name: #{coffee.shop_name}
-              Price: $#{coffee.cost}
-              "
-      end
     end
-  end
+  # end
+  welcome
 end
 
 def capitalize(name)
