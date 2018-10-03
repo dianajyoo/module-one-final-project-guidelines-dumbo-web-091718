@@ -1,17 +1,28 @@
 def welcome
-  puts "
-        Welcome to myBrews, #{capitalize($name)}
-        Please enter a number (1-7):
-        1. Add New Coffee
-        2. See All Coffee
-        3. Add to Favorites
-        4. Bring Up Favorites
-        5. Get a Suggestion
-        6. Search Coffees
-        7. Exit"
+  prompt = TTY::Prompt.new
+  # choices = %w(AddNewCoffee SeeAllCoffee AddToFavorites BringUpFavorites GetASuggestion SearchCoffee Exit)
+  choices = {
+    "Add New Coffee" => -> do add_new_coffee end,
+    "See All Coffee" => -> do see_all_coffees end,
+    "Add To Favorites" => -> do add_to_favorites end,
+    "Bring Up Favorites" => -> do bring_up_favorites end,
+    "Get A Suggestion" => -> do suggestion end,
+    "Search Coffee" => -> do search_coffees end,
+    "Quit" => -> do goodbye end
+    }
+
+  prompt.select("Welcome to myBrews, #{capitalize($name)}", choices)
+    menu.choice "Add New Coffee"
+    menu.choice "See All Coffee"
+    menu.choice "Add to Favorites"
+    menu.choice "Bring Up Favorites"
+    menu.choice "Get a Suggestion"
+    menu.choice "Search Coffee"
+    menu.choice "Quit"
 end
 
 def get_login
+prompt = TTY::Prompt.new
 
   puts "Welcome to myBrews!"
   puts "==================="
@@ -19,9 +30,8 @@ def get_login
   puts "Please enter full name to login"
   $name = gets.chomp.downcase
 
-  puts "Please enter a password"
-  $password = gets.chomp
-
+  heart = prompt.decorate('❤ ', :blue)
+  $password = prompt.mask("Please enter a password", mask: heart)
 
   while $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
     puts "Not a valid name. Please enter full name."
@@ -113,7 +123,13 @@ end
 
 def bring_up_favorites
   puts "You love this coffee(s):", ""
-  get_user.coffees.select {|coffee_name| coffee_name.favorites == true}.each {|fave_coffee| puts fave_coffee.name}
+
+  favorites = get_user.coffees.select {|coffee_name| coffee_name.favorites == true}
+  if favorites.empty?
+    puts "You have no favorites!", ""
+  else
+    favorites.each {|fave_coffee| puts fave_coffee.name, ""}
+  end
   welcome
 end
 
@@ -193,6 +209,10 @@ def search_coffees
     end
 end
 
+def goodbye
+  puts "Goodbye!"
+end
+
 def capitalize(name)
   if name.split(' ').size > 1
     name.split.map {|x| x.capitalize!}.join(' ')
@@ -201,14 +221,6 @@ def capitalize(name)
   end
 end
 
-# def menu(method, answer)
-#   if answer == "y"
-#     welcome
-#   elsif answer == "n"
-#     send(method)
-#   end
-# end
-
 def menu_message
   puts "If you would like to return to menu, please enter 'menu'"
 end
@@ -216,26 +228,4 @@ end
 def run
   get_login
   welcome
-  loop do
-    option = gets.chomp
-    case option
-    when "1"
-      add_new_coffee
-    when "2"
-      see_all_coffees
-    when "3"
-      add_to_favorites
-    when "4"
-      bring_up_favorites
-    when "5"
-      suggestion
-    when "6"
-      search_coffees
-    when "7"
-      puts "Goodbye!"
-      break
-    else
-      puts "Please enter a valid command."
-    end
-  end
 end
