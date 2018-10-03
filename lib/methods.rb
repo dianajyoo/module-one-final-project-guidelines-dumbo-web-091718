@@ -1,4 +1,11 @@
 def welcome
+  Catpix::print_image "./images/coffee_black_back.png",
+  :limit_x => 0.5,
+  :limit_y => 0.5,
+  :center_x => false,
+  :center_y => false,
+  :resolution => "high"
+
   prompt = TTY::Prompt.new
   # choices = %w(AddNewCoffee SeeAllCoffee AddToFavorites BringUpFavorites GetASuggestion SearchCoffee Exit)
   choices = {
@@ -11,6 +18,8 @@ def welcome
     "Quit" => -> do goodbye end
     }
 
+
+
   prompt.select("Welcome to myBrews, #{capitalize($name)}", choices)
     menu.choice "Add New Coffee"
     menu.choice "See All Coffee"
@@ -22,15 +31,25 @@ def welcome
 end
 
 def get_login
-prompt = TTY::Prompt.new
 
-  puts "Welcome to myBrews!"
-  puts "==================="
+  Catpix::print_image "./images/welcome.jpg",
+  :limit_x => 1.0,
+  :limit_y => 1.0,
+  :center_x => false,
+  :center_y => false,
+  :resolution => "high"
+
+  prompt = TTY::Prompt.new
+
+  pastel = Pastel.new
+  puts pastel.red.bold("Welcome to myBrews!")
+  puts pastel.red.bold("===================")
+
 
   puts "Please enter full name to login"
   $name = gets.chomp.downcase
 
-  heart = prompt.decorate('❤ ', :blue)
+  heart = prompt.decorate('❤ ', :cyan)
   $password = prompt.mask("Please enter a password", mask: heart)
 
   while $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
@@ -45,7 +64,7 @@ prompt = TTY::Prompt.new
     password = User.find_by(name: $name).password
     until password == $password
       puts "Incorrect Password! Please try again!", ""
-      $password = gets.chomp
+      $password = prompt.mask("Please enter a password", mask: heart)
     end
     User.find_by(password: $password)
   end
@@ -210,7 +229,12 @@ def search_coffees
 end
 
 def goodbye
-  puts "Goodbye!"
+  Catpix::print_image "./images/goodbye.png",
+  :limit_x => 0.75,
+  :limit_y => 0.75,
+  :center_x => false,
+  :center_y => false,
+  :resolution => "high"
 end
 
 def capitalize(name)
