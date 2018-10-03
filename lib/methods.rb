@@ -37,11 +37,12 @@ def get_user
 end
 
 def add_new_coffee
+  inputs = []
   menu_message
   user_id = User.find_by(name: $name, password: $password).id
 
   request = ["Please enter a coffee name", "Where did you get it?", "How did it taste?", "How much did it cost? (Enter Number)"]
-  array = request.map do |request|
+  request.each do |request|
     puts request
     input = gets.chomp.downcase
 
@@ -54,14 +55,15 @@ def add_new_coffee
         input = gets.chomp
       end
     end
-    input
+    inputs << input
   end
-  if array.count == 4
-    while array[3].to_f == 0
+
+  if inputs.count == 4
+    while inputs[3].to_f == 0
       puts "Please enter a valid number for cost"
-      array[3] = gets.chomp
+      inputs[3] = gets.chomp
     end
-    Coffee.create(name: capitalize(array[0]), shop_name: capitalize(array[1]), taste: array[2], cost: array[3])
+    Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), taste: inputs[2], cost: inputs[3])
     MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
     puts "Thanks for letting me know!"
     welcome
