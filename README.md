@@ -7,7 +7,7 @@ myBrews uses Ruby and ActiveRecord to manage and interact with multiple database
 myBrews is a Coffee Companion app, where users create a profile to save, favorite,
 search, and get suggestions for coffee.
 
-*ADDITIONAL GEMS*
+## ADDITIONAL GEMS
   1. faker
     -Generates fake data at random
 
@@ -21,7 +21,7 @@ search, and get suggestions for coffee.
   4. catpix
     - Allows for the implementation of images
 
-##Setup Instructions
+## Setup Instructions
 
 Run a bundle install
  ``` 
@@ -38,7 +38,7 @@ If you receive an error during installation due to "rmagick", follow these instr
   ```
   
 
-##How it Works:
+## How it Works:
   1. Upon running, user will be asked to enter your full name and a password.
     - If you haven't created a profile yet, it will create one for you.
     - If you have a profile but entered a wrong password, you will be asked to re-enter your password.
@@ -49,7 +49,7 @@ If you receive an error during installation due to "rmagick", follow these instr
   3. When you are finished, select "Quit" from the menu.
 
 
-#Enjoy!
+## Enjoy!
 
 ##Sources
 [Implementing images]: (https://radek.io/2015/06/29/catpix/)
