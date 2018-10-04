@@ -40,7 +40,7 @@ If you receive an error during installation due to "rmagick", follow these instr
 
 ## How it Works:
   1. Upon running, user will be asked to enter your full name and a password.
-    - If you haven't created a profile yet, it will create one for you.
+    *If you haven't created a profile yet, it will create one for you.*
     - If you have a profile but entered a wrong password, you will be asked to re-enter your password.
 
   2. Once you reach the menu, find a choice using the arrow and enter keys. Follow the prompts you are asked.
@@ -53,7 +53,7 @@ If you receive an error during installation due to "rmagick", follow these instr
 
 ## Sources
 
-[Implementing images](https://radek.io/2015/06/29/catpix/)
+[Implementing Images](https://radek.io/2015/06/29/catpix/)
 
 
 
