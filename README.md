@@ -9,7 +9,7 @@ search, and get suggestions for coffee.
 
 ## ADDITIONAL GEMS
   1. faker
-    - Generates fake data at random
+    * Generates fake data at random
 
   2. tty-prompt
     - An interactive command line prompt for getting and validating inputs
