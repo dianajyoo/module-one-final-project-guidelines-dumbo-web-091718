@@ -1,4 +1,5 @@
 **#myBrews CLI**
+
 created by [Diana Yoo](https://github.com/dianajyoo) and [Brian DiRito](https://github.com/bcdirito)
 
 myBrews uses Ruby and ActiveRecord to manage and interact with multiple databases.
@@ -23,7 +24,9 @@ search, and get suggestions for coffee.
 ##Setup Instructions
 
 Run a bundle install
- ``` $ bundle install```
+ ``` 
+ $ bundle install
+ ```
 
 If you receive an error during installation due to "rmagick", follow these instructions:
   ```
@@ -48,7 +51,8 @@ If you receive an error during installation due to "rmagick", follow these instr
 
 #Enjoy!
 
-
+##Sources
+[Implementing images]: (https://radek.io/2015/06/29/catpix/)
 
 
 
