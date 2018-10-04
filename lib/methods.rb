@@ -252,6 +252,7 @@ def goodbye
   :center_x => true,
   :center_y => true,
   :resolution => "high"
+  puts "Song - Words Fail by Brian Detlefs"
   sleep(8.seconds)
   exit
 end
