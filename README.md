@@ -1,4 +1,4 @@
-**#myBrews CLI**
+**# myBrews CLI**
 
 created by [Diana Yoo](https://github.com/dianajyoo) and [Brian DiRito](https://github.com/bcdirito)
 
@@ -9,7 +9,7 @@ search, and get suggestions for coffee.
 
 *ADDITIONAL GEMS*
   1. faker
-    - Generates fake data at random
+    -Generates fake data at random
 
   2. tty-prompt
     - An interactive command line prompt for getting and validating inputs
