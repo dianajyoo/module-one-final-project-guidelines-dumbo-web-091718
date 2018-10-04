@@ -92,16 +92,14 @@ def add_new_coffee
 
   request = ["Please enter a coffee name", "Where did you get it?", "How did it taste?", "How much did it cost? (Enter Number)"]
   request.each do |request|
-    puts request
-    input = gets.chomp.downcase
+    input = prompt.ask(request)
 
     if input == 'menu'
       welcome
       break
     else
-      until input.empty? == false
-        puts "Please enter a valid input"
-        input = gets.chomp
+      until input != nil && input.empty? == false
+        input = prompt.ask("Please enter a valid input")
       end
     end
     inputs << input
@@ -116,9 +114,8 @@ def add_new_coffee
   end
 
   if inputs.count == 4
-    while inputs[3].to_f == 0
-      puts "Please enter a valid number for cost"
-      inputs[3] = gets.chomp
+    while inputs[3].to_f <= 0
+      inputs[3] = prompt.ask("Please enter a valid number for cost")
     end
     Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), taste: inputs[2], cost: inputs[3])
     MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
