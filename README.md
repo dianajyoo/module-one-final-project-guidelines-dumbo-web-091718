@@ -52,7 +52,9 @@ If you receive an error during installation due to "rmagick", follow these instr
 ## Enjoy!
 
 ## Sources
+
 [Implementing images]: (https://radek.io/2015/06/29/catpix/)
+
 
 
 
