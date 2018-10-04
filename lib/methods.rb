@@ -58,7 +58,7 @@ def get_login
   heart = prompt.decorate('❤ ', :cyan)
   $password = prompt.mask("Please enter a password:", mask: heart)
 
-  until $name.split.count < 2 && $name.match(" ") == nil && $name[/[a-zA-Z]+/]  == $name
+  until $name.split.count >= 2 && $name.match(" ") != nil && $name[/[a-zA-Z]+/] == $name.split[0] && $name != nil
     puts "Not a valid name. Please enter full name.", "", ""
     get_login
   end
