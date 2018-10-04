@@ -1,4 +1,4 @@
-#**myBrews CLI**
+**#myBrews CLI**
 created by [Diana Yoo](https://github.com/dianajyoo) and [Brian DiRito](https://github.com/bcdirito)
 
 myBrews uses Ruby and ActiveRecord to manage and interact with multiple databases.
