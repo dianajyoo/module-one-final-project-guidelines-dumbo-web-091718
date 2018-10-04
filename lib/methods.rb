@@ -137,7 +137,6 @@ def add_to_favorites
     welcome
   else
     get_user.coffees.each do |coffee|
-      binding.pry
       if get_user.coffee_names.exclude?(capitalize(coffee_input))
         puts "No Coffee Found"
         welcome
