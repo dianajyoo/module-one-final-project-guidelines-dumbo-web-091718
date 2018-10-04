@@ -16,10 +16,10 @@ search, and get suggestions for coffee.
       - Allows for the implementation of menus
 
   3. pastel
-    - Changes text colors
+      - Changes text colors
 
   4. catpix
-    - Allows for the implementation of images
+      - Allows for the implementation of images
 
 ## Setup Instructions
 
@@ -40,11 +40,11 @@ If you receive an error during installation due to "rmagick", follow these instr
 
 ## How it Works:
   1. Upon running, user will be asked to enter your full name and a password.
-    - If you haven't created a profile yet, it will create one for you.
-    - If you have a profile but entered a wrong password, you will be asked to re-enter your password.
+      - If you haven't created a profile yet, it will create one for you.
+      - If you have a profile but entered a wrong password, you will be asked to re-enter your password.
 
   2. Once you reach the menu, find a choice using the arrow and enter keys. Follow the prompts you are asked.
-    - If at any point you wish to return to the main menu, enter "menu"
+      - If at any point you wish to return to the main menu, enter "menu"
 
   3. When you are finished, select "Quit" from the menu.
 
