@@ -270,12 +270,14 @@ def menu_message
 end
 
 def easter_egg
+  pid = fork{exec 'afplay', './media/music/hey_ya.m4a'}
   Catpix::print_image "./media/images/flatiron_school.png",
   :limit_x => 0.75,
   :limit_y => 0.75,
   :center_x => true,
   :center_y => true,
   :resolution => "high"
+  puts "Song - Hey Ya! by Outkast"
   sleep(5.seconds)
   welcome
 end
