@@ -108,6 +108,7 @@ def add_new_coffee
     Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), taste: inputs[2], cost: inputs[3])
     MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
     puts "Thanks for letting me know!"
+    sleep(1.seconds)
     welcome
   end
 end
@@ -120,6 +121,7 @@ def see_all_coffees
     puts "Here are your coffees:", ""
     get_user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
   end
+  sleep(2.seconds)
   welcome
 end
 
@@ -131,15 +133,16 @@ def add_to_favorites
     welcome
   else
     get_user.coffees.each do |coffee|
-      if coffee.name.downcase == coffee_input
+      if !get_user.coffee_names.include?(capitalize(coffee_input))
+        puts "No Coffee Found"
+        break
+      elsif coffee.name.downcase == coffee_input
         coffee.favorites = true
         coffee.save
         puts "Added to favorites!"
-      else
-        puts "", "Coffee not found"
-        break
       end
     end
+    sleep(1.second)
     welcome
   end
 end
@@ -153,6 +156,7 @@ def bring_up_favorites
   else
     favorites.each {|fave_coffee| puts fave_coffee.name, ""}
   end
+  sleep(2.seconds)
   welcome
 end
 
@@ -191,6 +195,7 @@ def suggestion
     else
       puts "It vanished!"
     end
+    sleep(1.second)
     welcome
   end
 end
@@ -228,6 +233,7 @@ def search_coffees
               Price: $#{found_coffee.cost}
               "
       end
+      sleep(2.seconds)
       welcome
     end
 end
