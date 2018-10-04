@@ -10,3 +10,5 @@ gem "tty-prompt"
 gem "pastel"
 gem "colorize", "~> 0.8.1"
 gem "catpix"
+gem 'animated_gif_detector'
+gem "rmagick"

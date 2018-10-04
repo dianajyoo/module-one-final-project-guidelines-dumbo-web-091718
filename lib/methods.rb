@@ -1,13 +1,18 @@
+def run
+  get_login
+  welcome
+end
+
 def welcome
   Catpix::print_image "./images/coffee_black_back.png",
   :limit_x => 0.5,
   :limit_y => 0.5,
-  :center_x => false,
-  :center_y => false,
+  :center_x => true,
+  :center_y => true,
   :resolution => "high"
 
   prompt = TTY::Prompt.new
-  # choices = %w(AddNewCoffee SeeAllCoffee AddToFavorites BringUpFavorites GetASuggestion SearchCoffee Exit)
+
   choices = {
     "Add New Coffee" => -> do add_new_coffee end,
     "See All Coffee" => -> do see_all_coffees end,
@@ -15,12 +20,12 @@ def welcome
     "Bring Up Favorites" => -> do bring_up_favorites end,
     "Get A Suggestion" => -> do suggestion end,
     "Search Coffee" => -> do search_coffees end,
-    "Quit" => -> do goodbye end
+    "Quit" => -> do goodbye end,
+    "" => -> do easter_egg end
     }
 
 
-
-  prompt.select("Welcome to myBrews, #{capitalize($name)}", choices)
+  prompt.select("Welcome to myBrews, #{capitalize($name)}", choices, cycle: true)
     menu.choice "Add New Coffee"
     menu.choice "See All Coffee"
     menu.choice "Add to Favorites"
@@ -28,6 +33,7 @@ def welcome
     menu.choice "Get a Suggestion"
     menu.choice "Search Coffee"
     menu.choice "Quit"
+    menu.choice ""
 end
 
 def get_login
@@ -35,22 +41,20 @@ def get_login
   Catpix::print_image "./images/welcome.jpg",
   :limit_x => 1.0,
   :limit_y => 1.0,
-  :center_x => false,
-  :center_y => false,
+  :center_x => true,
+  :center_y => true,
   :resolution => "high"
 
   prompt = TTY::Prompt.new
 
   pastel = Pastel.new
-  puts pastel.red.bold("Welcome to myBrews!")
-  puts pastel.red.bold("===================")
+  puts pastel.red.bold("Welcome to myBrews!".center(70, ' '))
+  puts pastel.red.bold("=====================".center(70, ' '))
 
-
-  puts "Please enter full name to login"
-  $name = gets.chomp.downcase
+  $name = prompt.ask("Please enter full name to login:").downcase
 
   heart = prompt.decorate('❤ ', :cyan)
-  $password = prompt.mask("Please enter a password", mask: heart)
+  $password = prompt.mask("Please enter a password:", mask: heart)
 
   while $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
     puts "Not a valid name. Please enter full name."
@@ -229,12 +233,14 @@ def search_coffees
 end
 
 def goodbye
-  Catpix::print_image "./images/goodbye.png",
+  Catpix::print_image "./images/goodbye_better.png",
   :limit_x => 0.75,
   :limit_y => 0.75,
-  :center_x => false,
-  :center_y => false,
+  :center_x => true,
+  :center_y => true,
   :resolution => "high"
+  sleep(3.seconds)
+  exit
 end
 
 def capitalize(name)
@@ -249,7 +255,13 @@ def menu_message
   puts "If you would like to return to menu, please enter 'menu'"
 end
 
-def run
-  get_login
+def easter_egg
+  Catpix::print_image "./images/flatiron_school.png",
+  :limit_x => 0.75,
+  :limit_y => 0.75,
+  :center_x => true,
+  :center_y => true,
+  :resolution => "high"
+  sleep(5.seconds)
   welcome
 end
