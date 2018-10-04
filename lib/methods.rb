@@ -5,7 +5,7 @@ def run
 end
 
 def welcome
-  Catpix::print_image "./images/coffee_black_back.png",
+  Catpix::print_image "./media/images/coffee_black_back.png",
   :limit_x => 0.5,
   :limit_y => 0.5,
   :center_x => true,
@@ -38,7 +38,8 @@ def welcome
 end
 
 def login_picture
-  Catpix::print_image "./images/welcome.jpg",
+  pid = fork{exec 'afplay', './media/music/words_fail.m4a'}
+  Catpix::print_image "./media/images/welcome.jpg",
   :limit_x => 1.0,
   :limit_y => 1.0,
   :center_x => true,
@@ -242,7 +243,8 @@ def search_coffees
 end
 
 def goodbye
-  Catpix::print_image "./images/goodbye_better.png",
+  pid = fork{exec 'afplay', './media/music/words_fail.m4a'}
+  Catpix::print_image "./media/images/goodbye_better.png",
   :limit_x => 0.75,
   :limit_y => 0.75,
   :center_x => true,
@@ -265,7 +267,7 @@ def menu_message
 end
 
 def easter_egg
-  Catpix::print_image "./images/flatiron_school.png",
+  Catpix::print_image "./media/images/flatiron_school.png",
   :limit_x => 0.75,
   :limit_y => 0.75,
   :center_x => true,
