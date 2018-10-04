@@ -1,4 +1,5 @@
 def run
+  login_picture
   get_login
   welcome
 end
@@ -36,8 +37,7 @@ def welcome
     menu.choice ""
 end
 
-def get_login
-
+def login_picture
   Catpix::print_image "./images/welcome.jpg",
   :limit_x => 1.0,
   :limit_y => 1.0,
@@ -45,21 +45,24 @@ def get_login
   :center_y => true,
   :resolution => "high"
 
-  prompt = TTY::Prompt.new
-
   pastel = Pastel.new
   puts pastel.red.bold("Welcome to myBrews!".center(70, ' '))
   puts pastel.red.bold("=====================".center(70, ' '))
+end
+
+def get_login
+  prompt = TTY::Prompt.new
 
   $name = prompt.ask("Please enter full name to login:").downcase
 
   heart = prompt.decorate('❤ ', :cyan)
   $password = prompt.mask("Please enter a password:", mask: heart)
 
-  while $name.split.count < 2 && $name.match(" ") == nil && $name.count("0-9") != 0
-    puts "Not a valid name. Please enter full name."
+  until $name.split.count < 2 && $name.match(" ") == nil && $name[/[a-zA-Z]+/]  == $name
+    puts "Not a valid name. Please enter full name.", "", ""
     get_login
   end
+
   users = User.where(name: $name)
 
   if users.empty?
