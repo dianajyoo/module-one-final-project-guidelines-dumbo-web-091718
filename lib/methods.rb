@@ -123,7 +123,7 @@ def see_all_coffees
     puts "No coffees!"
   else
     puts "Here are your coffees:", ""
-    get_user.coffee_names.each {|coffee_name| puts "#{coffee_name}"}
+    get_user.coffees.each {|coffee| puts "#{coffee.name} - #{coffee.shop_name}", ""}
   end
   sleep(2.seconds)
   welcome
@@ -137,8 +137,10 @@ def add_to_favorites
     welcome
   else
     get_user.coffees.each do |coffee|
-      if !get_user.coffee_names.include?(capitalize(coffee_input))
+      binding.pry
+      if get_user.coffee_names.exclude?(capitalize(coffee_input))
         puts "No Coffee Found"
+        welcome
         break
       elsif coffee.name.downcase == coffee_input
         coffee.favorites = true
@@ -152,13 +154,13 @@ def add_to_favorites
 end
 
 def bring_up_favorites
-  puts "You love this coffee(s):", ""
+  puts "You love this coffee:", ""
 
   favorites = get_user.coffees.select {|coffee_name| coffee_name.favorites == true}
   if favorites.empty?
     puts "You have no favorites!", ""
   else
-    favorites.each {|fave_coffee| puts fave_coffee.name, ""}
+    favorites.each {|fave_coffee| puts "#{fave_coffee.name} - #{fave_coffee.shop_name}", ""}
   end
   sleep(2.seconds)
   welcome
@@ -250,7 +252,7 @@ def goodbye
   :center_x => true,
   :center_y => true,
   :resolution => "high"
-  sleep(3.seconds)
+  sleep(8.seconds)
   exit
 end
 
