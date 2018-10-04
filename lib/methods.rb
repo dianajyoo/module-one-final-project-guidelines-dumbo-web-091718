@@ -54,15 +54,17 @@ end
 def get_login
   prompt = TTY::Prompt.new
 
-  $name = prompt.ask("Please enter full name to login:").downcase
+  $name = prompt.ask("Please enter full name to login:")
+
+  until $name != nil && $name.split.count >= 2 && $name.match(" ") != nil && $name[/[a-zA-Z]+/] == $name.split[0]
+    $name = prompt.ask("Please enter a valid full name:")
+  end
+
+  $name = $name.downcase
+
 
   heart = prompt.decorate('❤ ', :cyan)
   $password = prompt.mask("Please enter a password:", mask: heart)
-
-  until $name.split.count >= 2 && $name.match(" ") != nil && $name[/[a-zA-Z]+/] == $name.split[0] && $name != nil
-    puts "Not a valid name. Please enter full name.", "", ""
-    get_login
-  end
 
   users = User.where(name: $name)
 
@@ -72,7 +74,7 @@ def get_login
     password = User.find_by(name: $name).password
     until password == $password
       puts "Incorrect Password! Please try again!", ""
-      $password = prompt.mask("Please enter a password", mask: heart)
+      $password = prompt.mask("Please enter a password:", mask: heart)
     end
     User.find_by(password: $password)
   end
@@ -83,6 +85,7 @@ def get_user
 end
 
 def add_new_coffee
+  prompt = TTY::Prompt.new
   inputs = []
   menu_message
   user_id = User.find_by(name: $name, password: $password).id
@@ -102,6 +105,14 @@ def add_new_coffee
       end
     end
     inputs << input
+  end
+
+  until inputs[0] != nil && inputs[0][/[a-zA-Z]+/] == inputs[0].split[0]
+    inputs[0] = prompt.ask("Please enter a valid coffee name")
+  end
+
+  until inputs[1] != nil && inputs[1][/[a-zA-Z]+/] == inputs[1].split[0]
+    inputs[1] = prompt.ask("Please enter a valid shop name")
   end
 
   if inputs.count == 4
@@ -130,18 +141,22 @@ def see_all_coffees
 end
 
 def add_to_favorites
+  prompt = TTY::Prompt.new
   menu_message
-  puts "Please enter the coffee's name"
-  coffee_input = gets.chomp.downcase
+  coffee_input = prompt.ask("Please enter the coffee's name")
   if coffee_input == "menu"
     welcome
   else
+    until coffee_input != nil && coffee_input[/[a-zA-Z]+/] == coffee_input.split[0]
+      coffee_input = prompt.ask("Please enter a valid coffee name")
+    end
+
     get_user.coffees.each do |coffee|
       if get_user.coffee_names.exclude?(capitalize(coffee_input))
         puts "No Coffee Found"
         welcome
         break
-      elsif coffee.name.downcase == coffee_input
+      elsif coffee.name != nil && coffee.name.downcase == coffee_input.downcase
         coffee.favorites = true
         coffee.save
         puts "Added to favorites!"
