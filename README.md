@@ -79,4 +79,4 @@ If you receive an error during installation due to "rmagick", follow these instr
 
 
 
-  *FIND THE EASTER EGG*
+  ~FIND THE EASTER EGG~
