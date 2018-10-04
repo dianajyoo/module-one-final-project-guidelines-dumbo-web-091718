@@ -1,4 +1,4 @@
-#myBrews CLI
+#**myBrews CLI**
 created by [Diana Yoo](https://github.com/dianajyoo) and [Brian DiRito](https://github.com/bcdirito)
 
 myBrews uses Ruby and ActiveRecord to manage and interact with multiple databases.
@@ -23,14 +23,17 @@ search, and get suggestions for coffee.
 ##Setup Instructions
 
 Run a bundle install
-  $ bundle install
+ ``` $ bundle install```
 
 If you receive an error during installation due to "rmagick", follow these instructions:
+  ```
   1. brew uninstall imagemagick
   2. brew install imagemagick@6 && brew link imagemagick@6 --force
   3. gem install rmagick
   4. gem install catpix
   5. bundle install
+  ```
+  
 
 ##How it Works:
   1. Upon running, user will be asked to enter your full name and a password.
