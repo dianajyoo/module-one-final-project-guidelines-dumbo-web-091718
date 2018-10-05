@@ -150,7 +150,7 @@ def add_to_favorites
   coffee_input = prompt.ask("Please enter the coffee's name")
   shop_input = prompt.ask("Please enter a shop name")
 
-  until shop_input != nil && coffee_input != nil && coffee_input[/[a-zA-Z]+/] == coffee_input.split[0] && shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
+  until coffee_input != nil && shop_input != nil && coffee_input[/[a-zA-Z]+/] == coffee_input.split[0] && shop_input[/[a-zA-Z]+/] == shop_input.split[0] || [/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
     if coffee_input == nil || coffee_input[/[a-zA-Z]+/] != coffee_input.split[0]
     coffee_input = prompt.ask("Please enter a valid coffee name")
     elsif shop_input == nil || shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
@@ -164,22 +164,13 @@ def add_to_favorites
 
   if coffee_input.include?("menu") || shop_input.include?("menu")
     welcome
+  elsif get_user.coffee_names.exclude?(capitalize(coffee_input))
+    puts "No Coffee Found"
+    sleep(3.seconds)
+    welcome
   else
-    until coffee_input[/[a-zA-Z]+/] == coffee_input.split[0]
-      coffee_input = prompt.ask("Please enter a valid coffee name")
-    end
-
-    until shop_input[/[a-zA-Z]+/] == shop_input.split[0] || shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
-      coffee_input = prompt.ask("Please enter a valid coffee name")
-    end
-
     get_user.coffees.each do |coffee|
-      if get_user.coffee_names.exclude?(capitalize(coffee_input))
-        puts "No Coffee Found"
-        sleep(3.seconds)
-        welcome
-        break
-      elsif coffee.name != nil && coffee.name.downcase == coffee_input.downcase && coffee.shop_name.downcase == shop_input.downcase
+      if coffee.name.downcase == coffee_input.downcase && coffee.shop_name.downcase == shop_input.downcase
         coffee.favorites = true
         coffee.save
         puts "Added to favorites!"
