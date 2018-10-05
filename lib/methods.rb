@@ -47,8 +47,9 @@ def login_picture
   :resolution => "high"
 
   pastel = Pastel.new
-  puts pastel.red.bold("Welcome to myBrews!".center(70, ' '))
-  puts pastel.red.bold("=====================".center(70, ' '))
+  puts pastel.red.bold("Welcome to myBrews!")
+  puts pastel.red.bold("=====================")
+  puts ""
 end
 
 def get_login
@@ -87,20 +88,20 @@ end
 def add_new_coffee
   prompt = TTY::Prompt.new
   inputs = []
+  puts ""
   menu_message
   user_id = get_user.id
 
   request = ["Please enter a coffee name", "Where did you get it?", "How did it taste?", "How much did it cost? (Enter Number)"]
   request.each do |request|
+    puts ""
     input = prompt.ask(request)
-
+    until input != nil
+      input = prompt.ask("Please enter a valid input")
+    end
     if input.include?('menu')
       welcome
       break
-    else
-      until input != nil && input.empty? == false
-        input = prompt.ask("Please enter a valid input")
-      end
     end
     inputs << input
   end
@@ -128,10 +129,10 @@ end
 def see_all_coffees
   prompt = TTY::Prompt.new
   if get_user.coffee_names.empty?
-    puts "No coffees!"
+    puts "\nNo coffees!"
   else
-    puts "Here are your coffees:", ""
-    get_user.coffees.each {|coffee| puts "Name: #{coffee.name}\n Shop: #{coffee.shop_name}\n Cost: #{coffee.cost}\n Taste: #{coffee.taste}", ""}
+    puts "\nHere are your coffees:", ""
+    get_user.coffees.each {|coffee| puts "\n Name: #{coffee.name}\n Shop: #{coffee.shop_name}\n Cost: #{coffee.cost}\n Taste: #{coffee.taste}", ""}
   end
   input = prompt.ask("Press enter to return to menu")
   until input == nil
@@ -142,22 +143,30 @@ end
 
 def add_to_favorites
   prompt = TTY::Prompt.new
-  menu_message
+  puts "", menu_message
   coffee_input = prompt.ask("Please enter the coffee's name")
   shop_input = prompt.ask("Please enter a shop name")
+
+  until shop_input != nil && coffee_input != nil
+    if coffee_input == nil
+    coffee_input = prompt.ask("Please enter a valid coffee name")
+    elsif shop_input == nil
+      shop_input = prompt.ask("Please enter a valid shop name")
+    end
+  end
+
   if coffee_input.include?("menu") || shop_input.include?("menu")
     welcome
   else
-    until coffee_input != nil && coffee_input[/[a-zA-Z]+/] == coffee_input.split[0]
+    until coffee_input[/[a-zA-Z]+/] == coffee_input.split[0]
       coffee_input = prompt.ask("Please enter a valid coffee name")
     end
 
-    until shop_input != nil && shop_input[/[a-zA-Z]+/] == shop_input.split[0] || shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
+    until shop_input[/[a-zA-Z]+/] == shop_input.split[0] || shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
       coffee_input = prompt.ask("Please enter a valid coffee name")
     end
 
     get_user.coffees.each do |coffee|
-      binding.pry
       if get_user.coffee_names.exclude?(capitalize(coffee_input))
         puts "No Coffee Found"
         sleep(3.seconds)
@@ -176,13 +185,13 @@ end
 
 def bring_up_favorites
   prompt = TTY::Prompt.new
-  puts "You love this coffee:", ""
+  puts "", "You love this coffee:", ""
 
   favorites = get_user.coffees.select {|coffee_name| coffee_name.favorites == true}
   if favorites.empty?
-    puts "You have no favorites!", ""
+    puts "\nYou have no favorites!", ""
   else
-    favorites.each {|fave_coffee| puts "Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
+    favorites.each {|fave_coffee| puts "\n Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
   end
   input = prompt.ask("Press enter to return to menu")
   until input == nil
@@ -195,7 +204,10 @@ def suggestion
   prompt = TTY::Prompt.new
   menu_message
   cost = prompt.ask("How much do you want to pay? (Enter Number)")
-  if cost == "menu"
+  until cost != nil
+    cost = prompt.ask("Please enter a valid number")
+  end
+  if cost.include?("menu")
     welcome
   else
     until cost.to_f > 0.0
@@ -206,14 +218,13 @@ def suggestion
     puts "Maybe try this:"
     suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost.to_f).round(2), taste: Faker::Coffee.notes)
 
-    puts "
-          Name: #{suggestion.name}
-          Shop Name: #{suggestion.shop_name}
-          Price: $#{suggestion.cost}
-          Taste: #{suggestion.taste}
-          "
+    puts "\n Name: #{suggestion.name}\n Shop Name: #{suggestion.shop_name}\n Price: $#{suggestion.cost}\n Taste: #{suggestion.taste}", ""
 
     option = prompt.ask("Do you want to save this? (Y/N)").downcase
+
+    until option == "y" || option == "n"
+      option = prompt.ask("Please enter Y or N")
+    end
 
     if option == "y"
       suggestion.save
@@ -222,7 +233,7 @@ def suggestion
 
       MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
       puts "Saved"
-    else
+    elsif option == "n"
       puts "It vanished!"
     end
     sleep(3.second)
@@ -238,13 +249,12 @@ def search_coffees
   requests = ["What coffee would you like to search", "Which coffee shop?"]
   requests.each do |request|
     input = prompt.ask(request)
-    if input == 'menu'
+    until input != nil
+      input = prompt.ask("Please enter a valid input")
+    end
+    if input.include?('menu')
         welcome
         break
-    else
-      until input != nil
-        input = prompt.ask("Please enter a valid input")
-      end
     end
     inputs << input
   end
@@ -255,14 +265,10 @@ def search_coffees
       if found_coffee == nil
         puts "Sorry, no coffee by that name!"
       else
-        puts "
-              Name: #{found_coffee.name}
-              Shop Name: #{found_coffee.shop_name}
-              Price: $#{found_coffee.cost}
-              "
+        puts "\n Name: #{found_coffee.name}\n Shop Name: #{found_coffee.shop_name}\n Price: $#{found_coffee.cost}\n Taste: #{found_coffee.taste}", ""
       end
       menu_input = prompt.ask("Press enter to return to menu")
-      until input == nil
+      until menu_input == nil
         menu_input = prompt.ask("Press enter to return to menu")
       end
       welcome
@@ -293,6 +299,7 @@ end
 def menu_message
   puts "If you would like to return to menu, please enter 'menu'"
 end
+
 
 def easter_egg
   pid = fork{exec 'afplay', './media/music/hey_ya.m4a'}
