@@ -88,13 +88,13 @@ def add_new_coffee
   prompt = TTY::Prompt.new
   inputs = []
   menu_message
-  user_id = User.find_by(name: $name, password: $password).id
+  user_id = get_user.id
 
   request = ["Please enter a coffee name", "Where did you get it?", "How did it taste?", "How much did it cost? (Enter Number)"]
   request.each do |request|
     input = prompt.ask(request)
 
-    if input == 'menu'
+    if input.include?('menu')
       welcome
       break
     else
@@ -109,7 +109,7 @@ def add_new_coffee
     inputs[0] = prompt.ask("Please enter a valid coffee name")
   end
 
-  until inputs[1] != nil && inputs[1][/[a-zA-Z]+/] == inputs[1].split[0]
+  until inputs[1] != nil && inputs[1][/[a-zA-Z]+/] == inputs[1].split[0] || inputs[1][/[a-zA-Z]+'+[a-zA-Z]/] == inputs[1].split[0]
     inputs[1] = prompt.ask("Please enter a valid shop name")
   end
 
@@ -120,20 +120,23 @@ def add_new_coffee
     Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), taste: inputs[2], cost: inputs[3])
     MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
     puts "Thanks for letting me know!"
-    sleep(1.seconds)
+    sleep(3.seconds)
     welcome
   end
 end
 
 def see_all_coffees
-
+  prompt = TTY::Prompt.new
   if get_user.coffee_names.empty?
     puts "No coffees!"
   else
     puts "Here are your coffees:", ""
-    get_user.coffees.each {|coffee| puts "#{coffee.name} - #{coffee.shop_name}", ""}
+    get_user.coffees.each {|coffee| puts "Name: #{coffee.name}\n Shop: #{coffee.shop_name}\n Cost: #{coffee.cost}\n Taste: #{coffee.taste}", ""}
   end
-  sleep(2.seconds)
+  input = prompt.ask("Press enter to return to menu")
+  until input == nil
+    input = prompt.ask("Press enter to return to menu")
+  end
   welcome
 end
 
@@ -141,46 +144,57 @@ def add_to_favorites
   prompt = TTY::Prompt.new
   menu_message
   coffee_input = prompt.ask("Please enter the coffee's name")
-  if coffee_input == "menu"
+  shop_input = prompt.ask("Please enter a shop name")
+  if coffee_input.include?("menu") || shop_input.include?("menu")
     welcome
   else
     until coffee_input != nil && coffee_input[/[a-zA-Z]+/] == coffee_input.split[0]
       coffee_input = prompt.ask("Please enter a valid coffee name")
     end
 
+    until shop_input != nil && shop_input[/[a-zA-Z]+/] == shop_input.split[0] || shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
+      coffee_input = prompt.ask("Please enter a valid coffee name")
+    end
+
     get_user.coffees.each do |coffee|
+      binding.pry
       if get_user.coffee_names.exclude?(capitalize(coffee_input))
         puts "No Coffee Found"
+        sleep(3.seconds)
         welcome
         break
-      elsif coffee.name != nil && coffee.name.downcase == coffee_input.downcase
+      elsif coffee.name != nil && coffee.name.downcase == coffee_input.downcase && coffee.shop_name.downcase == shop_input.downcase
         coffee.favorites = true
         coffee.save
         puts "Added to favorites!"
       end
     end
-    sleep(1.second)
+    sleep(3.second)
     welcome
   end
 end
 
 def bring_up_favorites
+  prompt = TTY::Prompt.new
   puts "You love this coffee:", ""
 
   favorites = get_user.coffees.select {|coffee_name| coffee_name.favorites == true}
   if favorites.empty?
     puts "You have no favorites!", ""
   else
-    favorites.each {|fave_coffee| puts "#{fave_coffee.name} - #{fave_coffee.shop_name}", ""}
+    favorites.each {|fave_coffee| puts "Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
   end
-  sleep(2.seconds)
+  input = prompt.ask("Press enter to return to menu")
+  until input == nil
+    input = prompt.ask("Press enter to return to menu")
+  end
   welcome
 end
 
 def suggestion
-  puts menu_message
-  puts "How much do you want to pay? (Enter Number)"
-  cost = gets.chomp
+  prompt = TTY::Prompt.new
+  menu_message
+  cost = prompt.ask("How much do you want to pay? (Enter Number)")
   if cost == "menu"
     welcome
   else
@@ -199,8 +213,7 @@ def suggestion
           Taste: #{suggestion.taste}
           "
 
-    puts "Do you want to save this? (Y/N)"
-    option = gets.chomp.downcase
+    option = prompt.ask("Do you want to save this? (Y/N)").downcase
 
     if option == "y"
       suggestion.save
@@ -212,27 +225,25 @@ def suggestion
     else
       puts "It vanished!"
     end
-    sleep(1.second)
+    sleep(3.second)
     welcome
   end
 end
 
 def search_coffees
-
+  prompt = TTY::Prompt.new
   inputs = []
   menu_message
 
   requests = ["What coffee would you like to search", "Which coffee shop?"]
   requests.each do |request|
-    puts request
-    input = gets.chomp.downcase
+    input = prompt.ask(request)
     if input == 'menu'
         welcome
         break
     else
-      until input.empty? == false
-        puts "Please enter a valid input"
-        input = gets.chomp
+      until input != nil
+        input = prompt.ask("Please enter a valid input")
       end
     end
     inputs << input
@@ -250,7 +261,10 @@ def search_coffees
               Price: $#{found_coffee.cost}
               "
       end
-      sleep(2.seconds)
+      menu_input = prompt.ask("Press enter to return to menu")
+      until input == nil
+        menu_input = prompt.ask("Press enter to return to menu")
+      end
       welcome
     end
 end
