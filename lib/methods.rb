@@ -66,6 +66,9 @@ def get_login
 
   heart = prompt.decorate('❤ ', :cyan)
   $password = prompt.mask("Please enter a password:", mask: heart)
+  until $password != nil
+    $password = prompt.mask("Please enter a valid password:", mask: heart)
+  end
 
   users = User.where(name: $name)
 
@@ -106,11 +109,11 @@ def add_new_coffee
     inputs << input
   end
 
-  until inputs[0] != nil && inputs[0][/[a-zA-Z]+/] == inputs[0].split[0]
+  until inputs[0][/[a-zA-Z]+/] == inputs[0].split[0]
     inputs[0] = prompt.ask("Please enter a valid coffee name")
   end
 
-  until inputs[1] != nil && inputs[1][/[a-zA-Z]+/] == inputs[1].split[0] || inputs[1][/[a-zA-Z]+'+[a-zA-Z]/] == inputs[1].split[0]
+  until inputs[1][/[a-zA-Z]+/] == inputs[1].split[0] || inputs[1][/[a-zA-Z]+'+[a-zA-Z]/] == inputs[1].split[0]
     inputs[1] = prompt.ask("Please enter a valid shop name")
   end
 
@@ -147,11 +150,15 @@ def add_to_favorites
   coffee_input = prompt.ask("Please enter the coffee's name")
   shop_input = prompt.ask("Please enter a shop name")
 
-  until shop_input != nil && coffee_input != nil
-    if coffee_input == nil
+  until shop_input != nil && coffee_input != nil && coffee_input[/[a-zA-Z]+/] == coffee_input.split[0] && shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
+    if coffee_input == nil || coffee_input[/[a-zA-Z]+/] != coffee_input.split[0]
     coffee_input = prompt.ask("Please enter a valid coffee name")
-    elsif shop_input == nil
+    elsif shop_input == nil || shop_input[/[a-zA-Z]+'+[a-zA-Z]/] == shop_input.split[0]
       shop_input = prompt.ask("Please enter a valid shop name")
+    end
+
+    if coffee_input.include?("menu") || shop_input.include?("menu")
+      break
     end
   end
 
@@ -185,13 +192,12 @@ end
 
 def bring_up_favorites
   prompt = TTY::Prompt.new
-  puts "", "You love this coffee:", ""
 
   favorites = get_user.coffees.select {|coffee_name| coffee_name.favorites == true}
   if favorites.empty?
     puts "\nYou have no favorites!", ""
   else
-    favorites.each {|fave_coffee| puts "\n Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
+    favorites.each {|fave_coffee| puts "", "You love this coffee:", "", "\n Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
   end
   input = prompt.ask("Press enter to return to menu")
   until input == nil
@@ -259,20 +265,28 @@ def search_coffees
     inputs << input
   end
 
-    if inputs.count == 2
-      found_coffee = Coffee.find_by(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]))
+  until inputs[0][/[a-zA-Z]+/] == inputs[0].split[0]
+    inputs[0] = prompt.ask("Please enter a valid coffee name")
+  end
 
-      if found_coffee == nil
-        puts "Sorry, no coffee by that name!"
-      else
-        puts "\n Name: #{found_coffee.name}\n Shop Name: #{found_coffee.shop_name}\n Price: $#{found_coffee.cost}\n Taste: #{found_coffee.taste}", ""
-      end
-      menu_input = prompt.ask("Press enter to return to menu")
-      until menu_input == nil
-        menu_input = prompt.ask("Press enter to return to menu")
-      end
-      welcome
+  until inputs[1][/[a-zA-Z]+/] == inputs[1].split[0] || inputs[1][/[a-zA-Z]+'+[a-zA-Z]/] == inputs[1].split[0]
+    inputs[1] = prompt.ask("Please enter a valid shop name")
+  end
+
+  if inputs.count == 2
+    found_coffee = Coffee.find_by(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]))
+
+    if found_coffee == nil
+      puts "Sorry, no coffee by that name!"
+    else
+      puts "\n Name: #{found_coffee.name}\n Shop Name: #{found_coffee.shop_name}\n Price: $#{found_coffee.cost}\n Taste: #{found_coffee.taste}", ""
     end
+    menu_input = prompt.ask("Press enter to return to menu")
+    until menu_input == nil
+      menu_input = prompt.ask("Press enter to return to menu")
+    end
+    welcome
+  end
 end
 
 def goodbye
@@ -283,7 +297,7 @@ def goodbye
   :center_x => true,
   :center_y => true,
   :resolution => "high"
-  puts "Song - Words Fail by Brian Detlefs"
+  puts "Song - Words Fail by Brian Detlefs. Follow on Instagram @bdetlefsmusic"
   sleep(8.seconds)
   exit
 end
