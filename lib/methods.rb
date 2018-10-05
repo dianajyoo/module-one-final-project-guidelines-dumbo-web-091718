@@ -121,6 +121,7 @@ def add_new_coffee
     while inputs[3].to_f <= 0
       inputs[3] = prompt.ask("Please enter a valid number for cost")
     end
+
     Coffee.create(name: capitalize(inputs[0]), shop_name: capitalize(inputs[1]), taste: inputs[2], cost: inputs[3])
     MyCoffee.create(user_id: user_id, coffee_id: Coffee.last.id)
     puts "Thanks for letting me know!"
@@ -135,7 +136,7 @@ def see_all_coffees
     puts "\nNo coffees!"
   else
     puts "\nHere are your coffees:", ""
-    get_user.coffees.each {|coffee| puts "\n Name: #{coffee.name}\n Shop: #{coffee.shop_name}\n Cost: #{coffee.cost}\n Taste: #{coffee.taste}", ""}
+    get_user.coffees.each {|coffee| puts "\n Name: #{coffee.name}\n Shop: #{coffee.shop_name}\n Cost: #{'%.2f' % coffee.cost}\n Taste: #{coffee.taste}", ""}
   end
   input = prompt.ask("Press enter to return to menu")
   until input == nil
@@ -188,7 +189,7 @@ def bring_up_favorites
   if favorites.empty?
     puts "\nYou have no favorites!", ""
   else
-    favorites.each {|fave_coffee| puts "", "You love this coffee:", "", "\n Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
+    favorites.each {|fave_coffee| puts "", "You love this coffee:", "", "\n Name: #{fave_coffee.name}\n Shop: #{fave_coffee.shop_name}\n Cost: #{'%.2f' % fave_coffee.cost}\n Taste: #{fave_coffee.taste}", ""}
   end
   input = prompt.ask("Press enter to return to menu")
   until input == nil
@@ -215,7 +216,7 @@ def suggestion
     puts "Maybe try this:"
     suggestion = Coffee.new(name: Faker::Coffee.blend_name, shop_name: Faker::Hipster.word.capitalize + "'s", cost: rand(1..cost.to_f).round(2), taste: Faker::Coffee.notes)
 
-    puts "\n Name: #{suggestion.name}\n Shop Name: #{suggestion.shop_name}\n Price: $#{suggestion.cost}\n Taste: #{suggestion.taste}", ""
+    puts "\n Name: #{suggestion.name}\n Shop Name: #{suggestion.shop_name}\n Price: $#{'%.2f' % suggestion.cost}\n Taste: #{suggestion.taste}", ""
 
     option = prompt.ask("Do you want to save this? (Y/N)").downcase
 
@@ -270,7 +271,7 @@ def search_coffees
     if found_coffee == nil
       puts "Sorry, no coffee by that name!"
     else
-      puts "\n Name: #{found_coffee.name}\n Shop Name: #{found_coffee.shop_name}\n Price: $#{found_coffee.cost}\n Taste: #{found_coffee.taste}", ""
+      puts "\n Name: #{found_coffee.name}\n Shop Name: #{found_coffee.shop_name}\n Price: $#{'%.2f' % found_coffee.cost}\n Taste: #{found_coffee.taste}", ""
     end
     menu_input = prompt.ask("Press enter to return to menu")
     until menu_input == nil
