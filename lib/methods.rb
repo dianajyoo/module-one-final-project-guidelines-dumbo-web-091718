@@ -16,11 +16,11 @@ def welcome
 
   choices = {
     "Add New Coffee" => -> do add_new_coffee end,
-    "See All Coffee" => -> do see_all_coffees end,
+    "See Your Coffee" => -> do see_all_coffees end,
     "Add To Favorites" => -> do add_to_favorites end,
     "Bring Up Favorites" => -> do bring_up_favorites end,
     "Get A Suggestion" => -> do suggestion end,
-    "Search Coffee" => -> do search_coffees end,
+    "Search Coffee Database" => -> do search_coffees end,
     "Quit" => -> do goodbye end,
     "" => -> do easter_egg end
     }
@@ -28,11 +28,11 @@ def welcome
 
   prompt.select("Welcome to myBrews, #{capitalize($name)}", choices, cycle: true)
     menu.choice "Add New Coffee"
-    menu.choice "See All Coffee"
+    menu.choice "See Your Coffee"
     menu.choice "Add to Favorites"
     menu.choice "Bring Up Favorites"
     menu.choice "Get a Suggestion"
-    menu.choice "Search Coffee"
+    menu.choice "Search Coffee Database"
     menu.choice "Quit"
     menu.choice ""
 end
@@ -47,8 +47,8 @@ def login_picture
   :resolution => "high"
 
   pastel = Pastel.new
-  puts pastel.red.bold("Welcome to myBrews!")
-  puts pastel.red.bold("=====================")
+  puts pastel.cyan.bold("Welcome to myBrews!")
+  puts pastel.cyan.bold("=====================")
   puts ""
 end
 
